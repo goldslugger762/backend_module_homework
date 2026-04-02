@@ -1,0 +1,23 @@
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey
+from sqlalchemy.sql import func
+from sqlalchemy.orm import relationship
+from core.database import Base
+
+
+class Task(Base):
+    __tablename__ = "tasks"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    title = Column(String(255), nullable=False)
+    description = Column(String(500), nullable=True)
+    img_url = Column(String, nullable=True)
+
+    is_completed = Column(Boolean, default=False)
+
+    owner_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    comments = relationship("Comment", back_populates="task", cascade="all, delete", lazy="selectin")
+    owner = relationship("User", back_populates="tasks", lazy="selectin")
